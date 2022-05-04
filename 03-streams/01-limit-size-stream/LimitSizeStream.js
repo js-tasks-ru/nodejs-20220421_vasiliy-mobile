@@ -11,13 +11,12 @@ class LimitSizeStream extends stream.Transform {
 
   _transform(chunk, encoding, callback) {
     this.totalSize += Buffer.byteLength(chunk);
-    let error = null;
 
     if (this.limit < this.totalSize) {
-      error = new LimitExceededError();
+      callback(new LimitExceededError());
+    } else {
+      callback(null, chunk);
     }
-
-    callback(error, chunk);
   }
 }
 
