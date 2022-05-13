@@ -9,6 +9,10 @@
  * @return {boolean}
  */
 function isPathOfFirstLevel(path) {
+  if (!path) {
+    return false;
+  }
+
   return !/[\/\\]/.test(path);
 }
 

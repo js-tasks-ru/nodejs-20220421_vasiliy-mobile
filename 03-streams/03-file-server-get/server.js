@@ -1,43 +1,52 @@
 const http = require('http');
 const path = require('path');
-const fs = require('fs');
 
 const isPathOfFirstLevel = require('./isPathOfFirstLevel');
+const sendFile = require('./sendFile');
+
+const FILES_ROOT = path.resolve(__dirname, 'files');
 
 const server = new http.Server();
 
 server.on('request', (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  const pathname = url.pathname.slice(1);
+  let pathname = url.pathname.slice(1);
 
-  const filepath = path.join(__dirname, 'files', pathname);
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch (e) {
+    res.statusCode = 400;
+    res.end('Path not supported');
+
+    return;
+  }
+
+  if (-1 !== pathname.indexOf('\0')) {
+    res.statusCode = 400;
+    res.end('Path not supported');
+
+    return;
+  }
+
+  const filepath = path.normalize(path.join(FILES_ROOT, pathname));
+
+  if (0 !== filepath.indexOf(FILES_ROOT)) {
+    res.statusCode = 400;
+    res.end('Path not supported');
+
+    return;
+  }
 
   switch (req.method) {
     case 'GET':
       if (!isPathOfFirstLevel(pathname)) {
         res.statusCode = 400;
-        res.end('Included path not supported');
+        res.end('Path not supported');
 
         return;
       }
 
-      const fileStream = fs.createReadStream(filepath);
-
-      fileStream.pipe(res);
-
-      fileStream.on('error', (err) => {
-        if ('ENOENT' === err.code) {
-          res.statusCode = 404;
-          res.end('File not exists');
-        } else {
-          res.statusCode = 500;
-          res.end('Internal error');
-        }
-      });
-
-      req.on('aborted', () => {
-        fileStream.destroy();
-      });
+      sendFile(filepath, req, res);
 
       break;
 
