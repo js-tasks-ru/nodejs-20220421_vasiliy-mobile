@@ -2,6 +2,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
+const isPathOfFirstLevel = require('./isPathOfFirstLevel');
 const saveFile = require('./saveFile');
 
 const FILES_ROOT = path.join(__dirname, 'files');
@@ -28,11 +29,18 @@ server.on('request', (req, res) => {
     return;
   }
 
-  const filepath = path.join(FILES_ROOT, pathname);
+  const filepath = path.normalize(path.join(FILES_ROOT, pathname));
+
+  if (0 !== filepath.indexOf(FILES_ROOT)) {
+    res.statusCode = 400;
+    res.end('Path not supported');
+
+    return;
+  }
 
   switch (req.method) {
     case 'POST':
-      if (!pathname || /[\/\\]/.test(pathname)) {
+      if (!isPathOfFirstLevel(pathname)) {
         res.statusCode = 400;
         res.end('Path not supported');
 
