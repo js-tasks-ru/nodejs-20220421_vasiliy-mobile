@@ -1,7 +1,7 @@
 const Validator = require('../Validator');
 const expect = require('chai').expect;
 
-describe.only('testing-configuration-logging/unit-tests', () => {
+describe('testing-configuration-logging/unit-tests', () => {
   describe('Validator', () => {
     it('валидация: передан неверный тип', () => {
       const validator = new Validator({
