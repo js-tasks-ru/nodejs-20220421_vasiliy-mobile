@@ -118,4 +118,78 @@ describe.only('testing-configuration-logging/unit-tests', () => {
       expect(errors).to.have.length(0);
     });
   });
+
+  describe('Validator of numbers', () => {
+    it('валидация числа: значение слишком мало', () => {
+      const validator = new Validator({
+        age: {
+          type: 'number',
+          min: 18,
+          max: 50,
+        },
+      });
+
+      const errors = validator.validate({age: 10});
+
+      expect(errors[0]).to.have.property('field').and.to.be.equal('age');
+      expect(errors[0]).to.have.property('error').and.to.be.equal('too little, expect 18, got 10');
+    });
+
+    it('валидация числа: значение слишком велико', () => {
+      const validator = new Validator({
+        age: {
+          type: 'number',
+          min: 18,
+          max: 50,
+        },
+      });
+
+      const errors = validator.validate({age: 80});
+
+      expect(errors[0]).to.have.property('field').and.to.be.equal('age');
+      expect(errors[0]).to.have.property('error').and.to.be.equal('too big, expect 50, got 80');
+    });
+
+    it('валидация числа: значение равно минимальному', () => {
+      const validator = new Validator({
+        age: {
+          type: 'number',
+          min: 18,
+          max: 50,
+        },
+      });
+
+      const errors = validator.validate({age: 18});
+
+      expect(errors).to.have.length(0);
+    });
+
+    it('валидация числа: значение находится в между min и max', () => {
+      const validator = new Validator({
+        age: {
+          type: 'number',
+          min: 18,
+          max: 50,
+        },
+      });
+
+      const errors = validator.validate({age: 28});
+
+      expect(errors).to.have.length(0);
+    });
+
+    it('валидация числа: значение равно максимальному', () => {
+      const validator = new Validator({
+        age: {
+          type: 'number',
+          min: 18,
+          max: 50,
+        },
+      });
+
+      const errors = validator.validate({age: 50});
+
+      expect(errors).to.have.length(0);
+    });
+  });
 });
