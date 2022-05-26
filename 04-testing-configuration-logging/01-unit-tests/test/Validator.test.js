@@ -60,5 +60,62 @@ describe.only('testing-configuration-logging/unit-tests', () => {
       expect(errors[0]).to.have.property('field').and.to.be.equal('name');
       expect(errors[0]).to.have.property('error').and.to.be.equal('too short, expect 10, got 6');
     });
+
+    it('валидация строки: строка слишком длинная', () => {
+      const validator = new Validator({
+        name: {
+          type: 'string',
+          min: 3,
+          max: 5,
+        },
+      });
+
+      const errors = validator.validate({name: 'username'});
+
+      expect(errors[0]).to.have.property('field').and.to.be.equal('name');
+      expect(errors[0]).to.have.property('error').and.to.be.equal('too long, expect 5, got 8');
+    });
+
+    it('валидация строки: строка равна минимальной длине', () => {
+      const validator = new Validator({
+        name: {
+          type: 'string',
+          min: 3,
+          max: 5,
+        },
+      });
+
+      const errors = validator.validate({name: 'Jon'});
+
+      expect(errors).to.have.length(0);
+    });
+
+    it('валидация строки: строка между минимальной и максимальной длиной', () => {
+      const validator = new Validator({
+        name: {
+          type: 'string',
+          min: 3,
+          max: 10,
+        },
+      });
+
+      const errors = validator.validate({name: 'Jorge'});
+
+      expect(errors).to.have.length(0);
+    });
+
+    it('валидация строки: строка равна максимальной длине', () => {
+      const validator = new Validator({
+        name: {
+          type: 'string',
+          min: 3,
+          max: 5,
+        },
+      });
+
+      const errors = validator.validate({name: 'Maria'});
+
+      expect(errors).to.have.length(0);
+    });
   });
 });
