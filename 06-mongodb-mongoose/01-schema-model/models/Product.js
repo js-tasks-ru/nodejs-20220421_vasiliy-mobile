@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const connection = require('../libs/connection');
 
-const Category = require('./Category');
-
 const productSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -19,7 +17,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: Category,
+    ref: 'Category',
   },
   subcategory: {
     type: mongoose.Schema.Types.ObjectId,
